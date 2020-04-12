@@ -24,12 +24,10 @@ package com.sun.jna;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -673,7 +671,8 @@ public class Pointer {
      * @param offset
      *            byte offset from pointer to start reading bytes
      * @param maxBytes
-     *            the maximum number of bytes to read
+     *            the maximum number of bytes to read. This value must not exceed
+     *            allocated memory bounds.
      * @return the <code>String</code> value being pointed to, up to either a null
      *         terminator or <code>maxBytes</code>
      */
@@ -681,10 +680,7 @@ public class Pointer {
         // Fetch the maxBytes
         char[] data = this.getCharArray(offset, maxBytes / Native.WCHAR_SIZE);
         // Convert to String using Wide String encoding
-        String ws = new String(data);
-        // Truncate at null if necessary
-        int indexOfNull = ws.indexOf('\0');
-        return indexOfNull < 0 ? ws : ws.substring(0, indexOfNull);
+        return Native.toString(data);
     }
 
     /**
@@ -706,7 +702,8 @@ public class Pointer {
      * @param offset
      *            byte offset from pointer to start reading bytes
      * @param maxBytes
-     *            the maximum number of bytes to read
+     *            the maximum number of bytes to read. This value must not exceed
+     *            allocated memory bounds.
      * @return the <code>String</code> value being pointed to, up to either a null
      *         terminator or <code>maxBytes</code>
      */
@@ -733,7 +730,8 @@ public class Pointer {
      * @param offset
      *            byte offset from pointer to obtain the native string
      * @param maxBytes
-     *            the maximum number of bytes to read
+     *            the maximum number of bytes to read. This value must not exceed
+     *            allocated memory bounds.
      * @param encoding
      *            the desired encoding
      * @return the <code>String</code> value being pointed to, up to either a null
@@ -743,17 +741,7 @@ public class Pointer {
         // Fetch the maxBytes
         byte[] data = this.getByteArray(offset, maxBytes);
         // Convert to String
-        String s = "";
-        if (encoding != null) {
-            try {
-                s = new String(data, encoding);
-            } catch (UnsupportedEncodingException e) {
-                s = new String(data, Charset.defaultCharset());
-            }
-        }
-        // Truncate at null if necessary
-        int indexOfNull = s.indexOf('\0');
-        return indexOfNull < 0 ? s : s.substring(0, indexOfNull);
+        return Native.toString(data, encoding);
     }
 
     /**
