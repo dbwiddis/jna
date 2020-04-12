@@ -11,6 +11,7 @@ Features
 * [#1167](https://github.com/java-native-access/jna/pull/1167): Add `c.s.j.p.win32.Kernel32.GetProcessAffinityMask` - [@dbwiddis](https://github.com/dbwiddis).
 * [#1168](https://github.com/java-native-access/jna/pull/1168): Add `c.s.j.p.win32.Kernel32.SetProcessAffinityMask` - [@dbwiddis](https://github.com/dbwiddis).
 * [#1169](https://github.com/java-native-access/jna/issues/1169): Wait for process in getLinuxLdPaths - [@rdesgroppes](https://github.com/rdesgroppes).
+* [#1177](https://github.com/java-native-access/jna/pull/1177): Add maxBytes parameter to `Pointer#getString` and `Pointer#getWideString` - [@dbwiddis](https://github.com/dbwiddis).
 
 Bug Fixes
 ---------
