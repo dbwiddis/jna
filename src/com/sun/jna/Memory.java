@@ -566,16 +566,18 @@ public class Memory extends Pointer {
 
     /**
      * Indirect the native pointer to <code>malloc</code> space, a la
-     * <code>Pointer.getString</code>. But this method performs a bounds checks to
-     * ensure that the indirection does not cause memory outside the
-     * <code>malloc</code>ed space to be accessed.
+     * <code>Pointer.getString</code>. This method only performs a bounds check of
+     * the start of the string and could cause memory outside the
+     * <code>malloc</code>ed space to be accessed without a null terminator.
      * <p>
      * The encoding used is obtained from {@link Native#getDefaultStringEncoding()}.
+     * <p>
+     * If a null terminator is not assured, it may be preferred to use
+     * {@link #getString(long, int)}.
      *
      * @param offset
      *            byte offset from pointer to start reading bytes
-     * @return the <code>String</code> value being pointed to, up to either a null
-     *         terminator or the end of allocated memory.
+     * @return the <code>String</code> value being pointed to
      */
     @Override
     public String getString(long offset) {
@@ -587,17 +589,91 @@ public class Memory extends Pointer {
      * <code>Pointer.getString</code>. But this method performs a bounds checks to
      * ensure that the indirection does not cause memory outside the
      * <code>malloc</code>ed space to be accessed.
+     * <p>
+     * The encoding used is obtained from {@link Native#getDefaultStringEncoding()}.
+     * <p>
+     * This method reads all {@code maxBytes} from memory. If a null terminator is
+     * assured, it may be preferred to use {@link #getString(long)}.
      *
+     * @param offset
+     *            byte offset from pointer to start reading bytes
+     * @param maxBytes
+     *            the maximum number of bytes to read. This value must not exceed
+     *            allocated memory bounds.
      * @return the <code>String</code> value being pointed to, up to either a null
-     *         terminator or the end of allocated memory.
-     * @see Pointer#getString(long, int, String)
+     *         terminator or <code>maxBytes</code>
+     */
+    public String getString(long offset, int maxBytes) {
+        return getString(offset, maxBytes, Native.getDefaultStringEncoding());
+    }
+
+    /**
+     * Indirect the native pointer to <code>malloc</code> space, a la
+     * <code>Pointer.getString</code>. This method only performs a bounds check of
+     * the start of the string and could cause memory outside the
+     * <code>malloc</code>ed space to be accessed without a null terminator.
+     * <p>
+     * If a null terminator is not assured, it may be preferred to use
+     * {@link #getString(long, int, String)}.
+     *
+     * @param offset
+     *            byte offset from pointer to obtain the native string
+     * @param encoding
+     *            the desired encoding
+     * @return the <code>String</code> value being pointed to
      */
     @Override
     public String getString(long offset, String encoding) {
         // NOTE: we only make sure the start of the string is within bounds
         boundsCheck(offset, 0);
-        // Call super limiting to remaining allocated memory
-        return super.getString(offset, (int) (size() - offset), encoding);
+        return super.getString(offset, encoding);
+    }
+
+    /**
+     * Indirect the native pointer to <code>malloc</code> space, a la
+     * <code>Pointer.getString</code>. But this method performs a bounds checks to
+     * ensure that the indirection does not cause memory outside the
+     * <code>malloc</code>ed space to be accessed.
+     * <p>
+     * This method reads all {@code maxBytes} from memory. If a null terminator is
+     * assured, it may be preferred to use {@link #getString(long, String)}.
+     *
+     * @param offset
+     *            byte offset from pointer to obtain the native string
+     * @param maxBytes
+     *            the maximum number of bytes to read. This value must not exceed
+     *            allocated memory bounds.
+     * @param encoding
+     *            the desired encoding
+     * @return the <code>String</code> value being pointed to, up to either a null
+     *         terminator or <code>maxBytes</code>
+     */
+    public String getString(long offset, int maxBytes, String encoding) {
+        boundsCheck(offset, maxBytes);
+        // Fetch the maxBytes
+        byte[] data = this.getByteArray(offset, maxBytes);
+        // Convert to String
+        return Native.toString(data, encoding);
+    }
+
+    /**
+     * Indirect the native pointer to <code>malloc</code> space, a la
+     * <code>Pointer.getWideString</code>. This method only performs a bounds check
+     * of the start of the string and could cause memory outside the
+     * <code>malloc</code>ed space to be accessed without a null terminator.
+     * <p>
+     * If a null terminator is not assured, it may be preferred to use
+     * {@link #getWideString(long, int)}.
+     *
+     * @param offset
+     *            byte offset from pointer to obtain the native string
+     * @return the <code>String</code> value being pointed to
+     */
+    @Override
+    public String getWideString(long offset) {
+        // NOTE: we only make sure the start of the string is within bounds
+        boundsCheck(offset, 0);
+        return super.getWideString(offset);
     }
 
     /**
@@ -605,17 +681,24 @@ public class Memory extends Pointer {
      * <code>Pointer.getWideString</code>. But this method performs a bounds checks
      * to ensure that the indirection does not cause memory outside the
      * <code>malloc</code>ed space to be accessed.
+     * <p>
+     * This method reads all {@code maxBytes} from memory. If a null terminator is
+     * assured, it may be preferred to use {@link #getWideString(long)}.
      *
+     * @param offset
+     *            byte offset from pointer to obtain the native string
+     * @param maxBytes
+     *            the maximum number of bytes to read. This value must not exceed
+     *            allocated memory bounds.
      * @return the <code>String</code> value being pointed to, up to either a null
      *         terminator or the end of allocated memory.
-     * @see Pointer#getWideString(long, int)
      */
-    @Override
-    public String getWideString(long offset) {
-        // NOTE: we only make sure the start of the string is within bounds
-        boundsCheck(offset, 0);
-        // Call super limiting to remaining allocated memory
-        return super.getWideString(offset, (int) (size() - offset));
+    public String getWideString(long offset, int maxBytes) {
+        boundsCheck(offset, maxBytes);
+        // Fetch the maxBytes
+        char[] data = this.getCharArray(offset, maxBytes / Native.WCHAR_SIZE);
+        // Convert to String using Wide String encoding
+        return Native.toString(data);
     }
 
     //////////////////////////////////////////////////////////////////////////

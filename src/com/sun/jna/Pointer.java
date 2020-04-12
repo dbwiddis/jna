@@ -654,41 +654,16 @@ public class Pointer {
         return Native.getDirectByteBuffer(this, this.peer, offset, length).order(ByteOrder.nativeOrder());
     }
 
-    /**
-     * Read a wide (<code>const wchar_t *</code>) string from memory.
-     *
-     * @param offset
-     *            byte offset from pointer to start reading bytes
-     * @return the <code>String</code> value being pointed to
-     */
+    /** Read a wide (<code>const wchar_t *</code>) string from memory. */
     public String getWideString(long offset) {
         return Native.getWideString(this, this.peer, offset);
     }
 
     /**
-     * Read a wide (<code>const wchar_t *</code>) string from memory.
+     * Copy native memory to a Java String.  The encoding used is obtained
+     * form {@link Native#getDefaultStringEncoding()}.
      *
-     * @param offset
-     *            byte offset from pointer to start reading bytes
-     * @param maxBytes
-     *            the maximum number of bytes to read. This value must not exceed
-     *            allocated memory bounds.
-     * @return the <code>String</code> value being pointed to, up to either a null
-     *         terminator or <code>maxBytes</code>
-     */
-    public String getWideString(long offset, int maxBytes) {
-        // Fetch the maxBytes
-        char[] data = this.getCharArray(offset, maxBytes / Native.WCHAR_SIZE);
-        // Convert to String using Wide String encoding
-        return Native.toString(data);
-    }
-
-    /**
-     * Copy native memory to a Java String. The encoding used is obtained form
-     * {@link Native#getDefaultStringEncoding()}.
-     *
-     * @param offset
-     *            byte offset from pointer to start reading bytes
+     * @param offset byte offset from pointer to start reading bytes
      * @return the <code>String</code> value being pointed to
      */
     public String getString(long offset) {
@@ -696,58 +671,19 @@ public class Pointer {
     }
 
     /**
-     * Copy native memory to a Java String. The encoding used is obtained form
-     * {@link Native#getDefaultStringEncoding()}.
-     *
-     * @param offset
-     *            byte offset from pointer to start reading bytes
-     * @param maxBytes
-     *            the maximum number of bytes to read. This value must not exceed
-     *            allocated memory bounds.
-     * @return the <code>String</code> value being pointed to, up to either a null
-     *         terminator or <code>maxBytes</code>
-     */
-    public String getString(long offset, int maxBytes) {
-        return getString(offset, maxBytes, Native.getDefaultStringEncoding());
-    }
-
-    /**
      * Copy native memory to a Java String using the requested encoding.
      *
-     * @param offset
-     *            byte offset from pointer to obtain the native string
-     * @param encoding
-     *            the desired encoding
+     * @param offset byte offset from pointer to obtain the native string
+     * @param encoding the desired encoding
      * @return the <code>String</code> value being pointed to
      */
     public String getString(long offset, String encoding) {
         return Native.getString(this, offset, encoding);
     }
 
-    /**
-     * Copy native memory to a Java String using the requested encoding.
-     *
-     * @param offset
-     *            byte offset from pointer to obtain the native string
-     * @param maxBytes
-     *            the maximum number of bytes to read. This value must not exceed
-     *            allocated memory bounds.
-     * @param encoding
-     *            the desired encoding
-     * @return the <code>String</code> value being pointed to, up to either a null
-     *         terminator or <code>maxBytes</code>
-     */
-    public String getString(long offset, int maxBytes, String encoding) {
-        // Fetch the maxBytes
-        byte[] data = this.getByteArray(offset, maxBytes);
-        // Convert to String
-        return Native.toString(data, encoding);
-    }
-
-    /**
-     * Read a native array of bytes of size <code>arraySize</code> from the given
-     * <code>offset</code> from this {@link Pointer}.
-     */
+    /** Read a native array of bytes of size <code>arraySize</code> from the
+        given <code>offset</code> from this {@link Pointer}.
+    */
     public byte[] getByteArray(long offset, int arraySize) {
         byte[] buf = new byte[arraySize];
         read(offset, buf, 0, arraySize);
