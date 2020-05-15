@@ -914,7 +914,7 @@ public interface WinDef {
     public static class ULONGLONG extends IntegerType implements Comparable<ULONGLONG> {
 
         /** The Constant SIZE. */
-        public static final int SIZE = Native.LONG_SIZE *2;
+        public static final int SIZE = 8;
 
         /**
          * Instantiates a new ULONGLONG.
@@ -1726,7 +1726,7 @@ public interface WinDef {
          * @return the value
          */
         public CHAR getValue() {
-            return new CHAR(getPointer().getChar(0));
+            return new CHAR(getPointer().getByte(0));
         }
     }
 
