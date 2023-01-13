@@ -85,7 +85,9 @@ public class NativeLibraryTest extends TestCase {
         NativeLibrary.disposeAll();
         // Give the system a moment to unload the library; on OSX we
         // occasionally get the same library handle back on subsequent dlopen
-        Thread.sleep(2);
+        Thread.sleep(2000);
+        NativeLibrary.disposeAll();
+        Thread.sleep(2000);
 
         TestLibrary lib = Native.load("testlib", TestLibrary.class);
         assertEquals("Library should be newly loaded after explicit dispose of all native libraries",
