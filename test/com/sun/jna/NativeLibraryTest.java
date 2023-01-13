@@ -82,7 +82,7 @@ public class NativeLibraryTest extends TestCase {
     }
 
     public void testAvoidDuplicateLoads() throws Exception {
-        TestLibrary lib = Native.load("testlib", TestLibrary.class);
+        NativeLibrary lib = NativeLibrary.getInstance("testlib");
         Reference<NativeLibrary> ref = new WeakReference<NativeLibrary>(lib);
         NativeLibrary.disposeAll();
         // Give the system a moment to unload the library; on OSX we
